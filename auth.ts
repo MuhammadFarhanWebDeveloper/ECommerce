@@ -1,14 +1,33 @@
 export const runtime = "nodejs";
 
-import NextAuth from "next-auth";
+import NextAuth, { DefaultSession } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./lib/prisma";
 import authConfig from "./auth.config";
 import { compare } from "bcrypt";
 import Credentials from "next-auth/providers/credentials";
+declare module "next-auth" {
+  interface User {
+    role?: string;
+  }
+  interface Session {
+    user: {
+      role?: string;
+      id?: string;
+    } & DefaultSession["user"];
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id?: string;
+    role?: string;
+  }
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
-
+  trustHost: true,
   session: { strategy: "jwt" },
   providers: [
     ...authConfig.providers,
@@ -58,18 +77,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id;
         token.email = user.email;
-
-        const dbUser = await prisma.user.findUnique({
-          where: { email: user.email ?? "" },
-        });
-        token.role = dbUser?.role ?? "USER";
+        token.role = user.role;
       }
 
       return token;
     },
 
     async session({ session, token }) {
-      if (token) session.user.id = token.id as string;
+      if (token) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string; // Add role to session
+      }
       return session;
     },
   },
