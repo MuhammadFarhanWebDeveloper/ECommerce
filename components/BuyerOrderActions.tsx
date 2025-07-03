@@ -7,10 +7,11 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
-import { Eye,  MoreVertical } from "lucide-react";
+import { Eye, MoreVertical } from "lucide-react";
 import { cancelOrder, payNowAction } from "@/lib/actions/order.actions";
 import { Order } from "@prisma/client";
 import Link from "next/link";
+import { DeliveryOtpDialog } from "./DeliveryOtpDialog";
 
 export default function BuyerOrderActions({ order }: { order: Order }) {
   return (
@@ -26,7 +27,7 @@ export default function BuyerOrderActions({ order }: { order: Order }) {
           <Link href={`/profile/orders/${order.id}`}>
             <div className="flex items-center gap-2 ">
               <Eye className="h-4 w-4" />
-              View Details 
+              View Details
             </div>
           </Link>
         </DropdownMenuItem>
@@ -59,6 +60,12 @@ export default function BuyerOrderActions({ order }: { order: Order }) {
                 Cancel Order
               </button>
             </form>
+          </DropdownMenuItem>
+        )}
+
+        {order.status === "SHIPPED" && (
+          <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+            <DeliveryOtpDialog orderId={order.id} />
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>
