@@ -98,7 +98,7 @@ export default async function OrdersPage() {
                     </Badge>
                   </TableCell>
 
-                  <TableCell>${order.total.toFixed(2)}</TableCell>
+                  <TableCell>pkr:{order.total.toFixed(2)}</TableCell>
                   <TableCell>
                     {order.items.length}{" "}
                     {order.items.length === 1 ? "item" : "items"}

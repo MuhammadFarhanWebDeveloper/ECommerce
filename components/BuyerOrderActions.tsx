@@ -7,9 +7,10 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
-import { Eye, Link, MoreVertical } from "lucide-react";
+import { Eye,  MoreVertical } from "lucide-react";
 import { cancelOrder, payNowAction } from "@/lib/actions/order.actions";
 import { Order } from "@prisma/client";
+import Link from "next/link";
 
 export default function BuyerOrderActions({ order }: { order: Order }) {
   return (
@@ -21,11 +22,11 @@ export default function BuyerOrderActions({ order }: { order: Order }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         {/* View Details */}
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
           <Link href={`/profile/orders/${order.id}`}>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ">
               <Eye className="h-4 w-4" />
-              View Details
+              View Details 
             </div>
           </Link>
         </DropdownMenuItem>
