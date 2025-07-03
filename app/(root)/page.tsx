@@ -14,7 +14,7 @@ import { CardCarousel } from "@/components/card-carousel";
 import { getProducts } from "@/lib/actions/products";
 
 // Mock products data - in real app this would come from database
-
+export const dynamic = "force-dynamic"; 
 export default async function Home() {
   const products = await getProducts({ isFeaturedProducts: true });
 

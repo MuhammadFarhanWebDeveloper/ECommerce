@@ -6,13 +6,6 @@ import { prisma } from "./lib/prisma";
 import authConfig from "./auth.config";
 import { compare } from "bcrypt";
 import Credentials from "next-auth/providers/credentials";
-declare module "next-auth" {
-  interface User {
-    role?: string;
-  }
-}
-
-
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -55,41 +48,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
-
   callbacks: {
     authorized: async ({ auth }) => {
       return !!auth;
     },
-     async signIn({ user, account }) {
-      // This runs when user signs in
-      if (account?.provider === "google") {
-        // Check if user exists in your database
-        const existingUser = await prisma.user.findUnique({
-          where: { email: user.email ?? "" },
-        });
-        
-        // If new user, create with default role
-        if (!existingUser) {
-          await prisma.user.create({
-            data: {
-              email: user.email ?? "",
-              name: user.name,
-              image: user.image,
-              role: "USER", // Default role
-            },
-          });
-        }
-      }
-      return true;
-    },
-     async jwt({ token, user }) {
-      // Fetch user from database to get role
+    async jwt({ token, user }) {
       if (user?.email) {
         const dbUser = await prisma.user.findUnique({
           where: { email: user.email },
         });
         if (dbUser) {
           token.role = dbUser.role;
+          token.sub = dbUser.id;
         }
       }
       return token;
@@ -97,6 +67,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, token }) {
       if (session.user) {
         session.user.role = token.role as string | undefined; // Add role to session
+        if (!session.user.id && token.sub) {
+          session.user.id = token.sub;
+        }
       }
       return session;
     },

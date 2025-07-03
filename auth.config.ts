@@ -4,10 +4,12 @@ import Google from "next-auth/providers/google";
 
 declare module "next-auth" {
   interface User {
+    id?: string;
     role?: string;
   }
   interface Session {
     user: {
+      id?: string;
       role?: string;
     } & DefaultSession["user"];
   }
@@ -18,15 +20,7 @@ export default {
     Google({
       clientId: process.env.AUTH_GOOGLE_ID!,
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
-      profile(profile) {
-        return {
-          id: profile.sub,
-          name: profile.name,
-          email: profile.email,
-          image: profile.picture,
-          role: profile.role ?? "USER" // Default role
-        };
-      }
+  
     }),
   ],
   session: { strategy: "jwt" },

@@ -14,7 +14,6 @@ export default async function ProfilePage() {
 
   const sess = await auth();
 
-console.log("Session:", sess);
   const user = sess?.user;
   if (!user) {
     return (

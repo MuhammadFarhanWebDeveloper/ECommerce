@@ -10,7 +10,6 @@ export default auth(async function middleware(req) {
   const session = req.auth;
   const role = session?.user?.role;
 
-  console.log("User role:", session);
   const isLoggedIn = !!req.auth;
   const path = url.pathname;
 
