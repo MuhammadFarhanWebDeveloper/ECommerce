@@ -8,10 +8,9 @@ const { auth } = NextAuth(authConfig);
 export default auth(async function middleware(req) {
   const url = req.nextUrl;
   const session = req.auth;
+  const role = session?.user?.role;
 
-  const token = await getToken({ req, secret: process.env.AUTH_SECRET });
-  const role = token?.role;
-
+  console.log("User role:", session);
   const isLoggedIn = !!req.auth;
   const path = url.pathname;
 

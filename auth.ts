@@ -10,25 +10,14 @@ declare module "next-auth" {
   interface User {
     role?: string;
   }
-  interface Session {
-    user: {
-      role?: string;
-      id?: string;
-    } & DefaultSession["user"];
-  }
 }
 
-declare module "next-auth/jwt" {
-  interface JWT {
-    id?: string;
-    role?: string;
-  }
-}
+
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   trustHost: true,
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
   providers: [
     ...authConfig.providers,
@@ -107,7 +96,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.role = token.role; // Add role to session
+        session.user.role = token.role as string | undefined; // Add role to session
       }
       return session;
     },
