@@ -28,6 +28,7 @@ declare module "next-auth/jwt" {
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   trustHost: true,
+  secret: process.env.AUTH_SECRET,
   session: { strategy: "jwt" },
   providers: [
     ...authConfig.providers,
@@ -70,23 +71,43 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     authorized: async ({ auth }) => {
       return !!auth;
     },
-    async jwt({ token, user }) {
-      console.log("JWT Callback");
-      console.log(user);
-
-      if (user) {
-        token.id = user.id;
-        token.email = user.email;
-        token.role = user.role;
+     async signIn({ user, account }) {
+      // This runs when user signs in
+      if (account?.provider === "google") {
+        // Check if user exists in your database
+        const existingUser = await prisma.user.findUnique({
+          where: { email: user.email ?? "" },
+        });
+        
+        // If new user, create with default role
+        if (!existingUser) {
+          await prisma.user.create({
+            data: {
+              email: user.email ?? "",
+              name: user.name,
+              image: user.image,
+              role: "USER", // Default role
+            },
+          });
+        }
       }
-
+      return true;
+    },
+     async jwt({ token, user }) {
+      // Fetch user from database to get role
+      if (user?.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: user.email },
+        });
+        if (dbUser) {
+          token.role = dbUser.role;
+        }
+      }
       return token;
     },
-
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string; // Add role to session
+      if (session.user) {
+        session.user.role = token.role; // Add role to session
       }
       return session;
     },

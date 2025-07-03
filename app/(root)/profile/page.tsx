@@ -5,26 +5,29 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { cookies } from "next/headers";
-import { getToken } from "next-auth/jwt";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { auth } from "@/auth";
 export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
-  const cookieStore = await cookies();
-  const req = {
-    headers: {
-      cookie: cookieStore.toString(),
-    },
-  } as any;
 
-  const token = await getToken({ req, secret: process.env.AUTH_SECRET });
-  console.log(token);
-  const user = {
-    name: token?.name,
-    email: token?.email,
-    image: token?.picture,
-    role: token?.role,
-  };
+
+  const sess = await auth();
+
+
+  const user = sess?.user;
+  if (!user) {
+    return (
+      <div className="max-w-3xl mx-auto py-8">
+        <h1 className="text-2xl font-semibold">
+          Please log in to view your profile
+        </h1>
+        <Link href="/login">
+          <Button className="mt-4">Login</Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto py-8 space-y-6">

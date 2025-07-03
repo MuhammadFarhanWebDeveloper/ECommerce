@@ -1,4 +1,4 @@
-import {  NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import NextAuth from "next-auth";
 import authConfig from "./auth.config";
 import { getToken } from "next-auth/jwt";
@@ -7,6 +7,8 @@ const { auth } = NextAuth(authConfig);
 
 export default auth(async function middleware(req) {
   const url = req.nextUrl;
+  const session = req.auth;
+
   const token = await getToken({ req, secret: process.env.AUTH_SECRET });
   const role = token?.role;
 
@@ -16,18 +18,17 @@ export default auth(async function middleware(req) {
   const publicPaths = ["/login", "/signup"];
   const protectedPaths = ["/profile", "/checkout", "/order-success", "/admin"];
 
-  
   if (isLoggedIn && publicPaths.includes(path)) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
-  
   if (!isLoggedIn && protectedPaths.some((p) => path.startsWith(p))) {
-return NextResponse.rewrite(new URL('/404', req.url))  }
+    return NextResponse.rewrite(new URL("/404", req.url));
+  }
 
-  
   if (isLoggedIn && path.startsWith("/admin") && role !== "ADMIN") {
-return NextResponse.rewrite(new URL('/404', req.url))  }
+    return NextResponse.rewrite(new URL("/404", req.url));
+  }
 
   return NextResponse.next();
 });

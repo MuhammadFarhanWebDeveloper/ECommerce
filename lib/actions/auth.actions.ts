@@ -2,9 +2,7 @@
 import { prisma } from "../prisma";
 import { UserFormSchema } from "../validations";
 import { z } from "zod";
-import { signIn } from "@/auth";
-import { signOut } from "@/auth";
-import { getToken } from "next-auth/jwt";
+import { auth, signIn } from "@/auth";
 import { hash } from "bcrypt";
 import { cookies } from "next/headers";
 import { Role } from "@prisma/client";
@@ -40,8 +38,9 @@ export const createUserAction = async (data: CreateUserInput) => {
       },
     } as any;
 
-    const token = await getToken({ req, secret: process.env.AUTH_SECRET });
-    if (!token || token.role !== "ADMIN") {
+    const session = await auth();
+    const user = session?.user;
+    if (!user || user.role !== "ADMIN") {
       return { success: false, message: "Unauthorized to create users." };
     }
 
@@ -90,9 +89,9 @@ export const updateUserAction = async (data: UpdateUserInput) => {
         cookie: cookieStore.toString(),
       },
     } as any;
-
-    const token = await getToken({ req, secret: process.env.AUTH_SECRET });
-    if (!token || token.role !== "ADMIN") {
+    const session = await auth();
+    const user = session?.user;
+    if (!user || user.role !== "ADMIN") {
       return { success: false, message: "Unauthorized to update users." };
     }
 
@@ -158,8 +157,9 @@ export const getUserById = async (id: string) => {
       },
     } as any;
 
-    const token = await getToken({ req, secret: process.env.AUTH_SECRET });
-    if (!token || token.role !== "ADMIN") {
+    const session = await auth();
+    const sessionUser = session?.user;
+    if (!sessionUser || sessionUser.role !== "ADMIN") {
       return null;
     }
 
