@@ -52,17 +52,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return !!auth;
     },
     async jwt({ token, user }) {
-      // On first login (when `user` is available), get role directly
+      console.log("JWT Callback");
+      console.log(user);
+
       if (user) {
         token.id = user.id;
         token.email = user.email;
 
-        // Manually fetch the user from DB to get the role
         const dbUser = await prisma.user.findUnique({
           where: { email: user.email ?? "" },
         });
-
-        token.role = dbUser?.role ?? "USER"; // fallback role
+        token.role = dbUser?.role ?? "USER";
       }
 
       return token;

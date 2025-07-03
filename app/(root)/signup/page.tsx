@@ -55,8 +55,7 @@ export default function SignUpPage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
+
     startSubmitting(async () => {
       const res = await fetch("/api/auth/signup", {
         method: "POST",

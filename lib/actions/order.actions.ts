@@ -37,6 +37,38 @@ export async function createOrder(data: CreateOrderParams) {
     if (!session || !session.user?.email) {
       redirect("/login");
     }
+
+    // Step 1: Fetch product variants with product data
+    const dbVariants = await prisma.productVariant.findMany({
+      where: {
+        id: {
+          in: data.items.map((item) => item.variantId),
+        },
+      },
+      include: {
+        product: true,
+      },
+    });
+
+    // Step 2: Check if all variants exist
+    if (dbVariants.length !== data.items.length) {
+      return { notFound: true };
+    }
+
+    // Step 3: Check for any price mismatches
+    const priceChanged = dbVariants.some((dbVariant) => {
+      const orderItem = data.items.find(
+        (item) => item.variantId === dbVariant.id
+      );
+
+      return !orderItem || orderItem.priceAtTime !== dbVariant.product.price;
+    });
+
+    if (priceChanged) {
+      return { changed: true };
+    }
+
+    // Step 4: Proceed with order creation
     const order = await prisma.order.create({
       data: {
         userId: data.userId,
@@ -66,7 +98,7 @@ export async function createOrder(data: CreateOrderParams) {
       order.deliveryOtp!
     );
 
-    return order;
+    return { order };
   } catch (error) {
     console.error("Error creating order:", error);
     throw error;

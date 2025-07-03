@@ -20,6 +20,9 @@ import { Loader2 } from "lucide-react";
 import { createOrder, createStripeSession } from "@/lib/actions/order.actions";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useSession } from "next-auth/react";
+import { clearCart } from "@/lib/store/features/cart/cart-slice";
+import { toast } from "sonner";
+export const dynamic = "force-dynamic";
 
 export default function CheckoutPage() {
   const cartItems = useSelector((state: RootState) => state.cart);
@@ -30,7 +33,6 @@ export default function CheckoutPage() {
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState("");
-  const [status, setStatus] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const subtotal = cartItems.reduce(
@@ -42,15 +44,14 @@ export default function CheckoutPage() {
 
   async function handlePlaceOrder() {
     if (!session?.user?.id) {
-      setStatus("User not logged in.");
+      toast.error("User not logged in.");
       setIsLoading(false);
       return;
     }
     setIsLoading(true);
-    setStatus("");
 
     try {
-      const order = await createOrder({
+      const res = await createOrder({
         userId: session.user.id,
         total,
         shippingAddress: address,
@@ -67,25 +68,38 @@ export default function CheckoutPage() {
         })),
       });
 
-      console.log("Order created:", order);
+      if (res.changed || res.notFound) {
+        toast.error(
+          "Some items in your cart have changed or are no longer available."
+        );
+        setIsLoading(false);
+        clearCart();
+        return;
+      }
+
+      if (!res.order) {
+        toast.error("Failed to create order. Please try again.");
+        setIsLoading(false);
+        return;
+      }
 
       if (paymentMethod === "CashOnDelivery") {
-        router.push(`/order-success?orderId=${order.id}`);
+        router.push(`/order-success?orderId=${res.order.id}`);
       } else if (paymentMethod === "Stripe") {
         if (!session.user.email) {
-          setStatus("User email not found. Cannot create Stripe session.");
+          toast.error("User email not found. Cannot create Stripe session.");
           setIsLoading(false);
           return;
         }
         const stripeSession = await createStripeSession(
-          order.id,
+          res.order.id,
           total,
           session.user.email
         );
       }
     } catch (error: any) {
       console.error(error);
-      setStatus(`Error placing order: ${error.message || "Unknown error"}`);
+      toast.error(`Error placing order: ${error.message || "Unknown error"}`);
     } finally {
       setIsLoading(false);
     }
@@ -232,15 +246,6 @@ export default function CheckoutPage() {
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Place Order
               </Button>
-              {status && (
-                <p
-                  className={`text-sm ${
-                    status.includes("Error") ? "text-red-500" : "text-green-500"
-                  }`}
-                >
-                  {status}
-                </p>
-              )}
             </CardFooter>
           </Card>
         </div>

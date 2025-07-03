@@ -1,8 +1,10 @@
 import { getAdminDashboardStats } from "@/lib/actions/products";
 import React from "react";
 
+export const dynamic = "force-dynamic";
 export default async function AdminDashboardPage() {
-  const { totalRevenue, totalOrders, totalProducts } = await getAdminDashboardStats();
+  const { totalRevenue, totalOrders, totalProducts } =
+    await getAdminDashboardStats();
 
   return (
     <div className="p-3">
@@ -11,7 +13,9 @@ export default async function AdminDashboardPage() {
       <div className="p-3 md:px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         <div className="p-2 rounded-lg shadow-lg">
           <h2 className="text-xl font-bold">Revenue</h2>
-          <h2 className="text-lg font-semibold">PKR {totalRevenue.toLocaleString()}</h2>
+          <h2 className="text-lg font-semibold">
+            PKR {totalRevenue.toLocaleString()}
+          </h2>
         </div>
         <div className="p-2 rounded-lg shadow-lg">
           <h2 className="text-xl font-bold">Total Orders</h2>
