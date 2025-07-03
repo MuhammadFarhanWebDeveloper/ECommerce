@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cookies } from "next/headers";
 import { getToken } from "next-auth/jwt";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
   const cookieStore = await cookies();
@@ -15,7 +16,9 @@ export default async function ProfilePage() {
       cookie: cookieStore.toString(),
     },
   } as any;
+
   const token = await getToken({ req, secret: process.env.AUTH_SECRET });
+  console.log(token);
   const user = {
     name: token?.name,
     email: token?.email,
@@ -30,8 +33,12 @@ export default async function ProfilePage() {
           <CardTitle>Account Info</CardTitle>
         </CardHeader>
         <CardContent className="flex items-center gap-4">
-          <Avatar > 
-            <AvatarImage width={64} height={64}  src={user.image || "/images/noavatar.png"} />
+          <Avatar>
+            <AvatarImage
+              width={64}
+              height={64}
+              src={user.image || "/images/noavatar.png"}
+            />
             <AvatarFallback>{user.name?.at(0)?.toUpperCase()}</AvatarFallback>
           </Avatar>
           <div>
@@ -62,8 +69,6 @@ export default async function ProfilePage() {
           )}
         </CardContent>
       </Card>
-
-      
     </div>
   );
 }
