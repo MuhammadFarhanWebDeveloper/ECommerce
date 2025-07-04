@@ -59,7 +59,7 @@ export function ProductCard({
               {name}
             </h3>
           </Link>
-          <p className="text-xl font-bold text-gray-800">${price.toFixed(2)}</p>
+          <p className="text-xl font-bold text-gray-800">pkr{price.toFixed(2)}</p>
 
           {/* Gender and Category */}
           <div className="text-sm text-muted-foreground">

@@ -4,7 +4,6 @@ import React, { useState, MouseEvent, useEffect } from "react";
 import ColorSelector from "./ColorSelector";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { cn } from "@/lib/utils";
-// import { product } from "@/lib/data";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
@@ -151,7 +150,7 @@ function ProductOverview({ product }: { product: Product }) {
                 activeImage === image.url && "border-4"
               }`}
             >
-              <Image
+              <img
                 src={image.url}
                 width={90}
                 height={90}
@@ -166,6 +165,7 @@ function ProductOverview({ product }: { product: Product }) {
         <div className="relative md:order-2 order-1 p-2 md:h-full md:w-[470px]">
           <img
             src={activeImage}
+            key={activeImage}
             alt="Main product"
             className="w-full border cursor-zoom-in border-black h-full object-contain"
             onMouseMove={handleImageZooming}

@@ -12,12 +12,13 @@ import {
 import Link from "next/link";
 import { CardCarousel } from "@/components/card-carousel";
 import { getProducts } from "@/lib/actions/products";
+import { ProductCard } from "@/components/product-card";
 
-// Mock products data - in real app this would come from database
-export const dynamic = "force-dynamic"; 
+export const dynamic = "force-dynamic";
 export default async function Home() {
-  const products = await getProducts({ isFeaturedProducts: true });
-
+  const products = await getProducts();
+  const featuredProducts = products.filter((product) => product.isFeatured);
+  const nonFeaturedProducts = products.filter((product) => !product.isFeatured);
   return (
     <div className="min-h-screen bg-background">
       {/* Banner/Hero Section */}
@@ -76,9 +77,19 @@ export default async function Home() {
       {/* Featured Products Section */}
       <section className="container mx-auto px-4 py-8">
         {/* Products Grid */}
-        {products.length > 0 && (
-          <CardCarousel products={products} title="FeaturedProducts" />
+        {featuredProducts.length > 0 && (
+          <CardCarousel products={featuredProducts} title="FeaturedProducts" />
         )}
+          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 container mx-auto px-4 py-8 gap-4">
+        {nonFeaturedProducts.length > 0
+          ? nonFeaturedProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                {...{ ...product, image: product.images[0].url }}
+              />
+            ))
+          : ""}
+      </section>
 
         <div className="text-center mt-8">
           <Button variant="outline" size="lg" asChild>
@@ -89,6 +100,8 @@ export default async function Home() {
           </Button>
         </div>
       </section>
+
+    
 
       {/* Additional Sections */}
       <section className="bg-muted/50 py-16">
