@@ -39,7 +39,7 @@ export default function CheckoutPage() {
     (sum, item) => sum + item.price * item.quantity,
     0
   );
-  const shippingCost = 5.0;
+  const shippingCost = 0;
   const total = subtotal + shippingCost;
 
   async function handlePlaceOrder() {
@@ -151,7 +151,7 @@ export default function CheckoutPage() {
                   <div className="flex items-center justify-between">
                     <p className="text-muted-foreground">Shipping</p>
                     <p className="font-medium">
-                      PKR {shippingCost.toLocaleString("en-PK")}
+                      {shippingCost===0?"Free":`PKR ${shippingCost}`}
                     </p>
                   </div>
                   <Separator />

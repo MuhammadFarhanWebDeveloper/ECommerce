@@ -49,7 +49,7 @@ export function CartSheet({ onUpdateQuantity, onRemoveItem }: CartSheetProps) {
     (total, item) => total + item.price * item.quantity,
     0
   );
-  const shipping = subtotal > 0 ? 5.99 : 0;
+  const shipping = 0;
   const total = subtotal + shipping;
 
   return (
@@ -190,7 +190,7 @@ export function CartSheet({ onUpdateQuantity, onRemoveItem }: CartSheetProps) {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Shipping</span>
-                  <span>PKR:{shipping.toLocaleString()}</span>
+                  <span>{shipping == 0 ? "Free" : `PKR:${shipping}`}</span>
                 </div>
                 <div className="flex justify-between font-medium">
                   <span>Total</span>
