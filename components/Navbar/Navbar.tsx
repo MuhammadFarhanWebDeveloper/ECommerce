@@ -61,14 +61,14 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center space-x-1">
               <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-lg">
-                  E
+                  T
                 </span>
               </div>
               <span className="hidden font-bold text-xl sm:inline-block">
-                EcoShop
+                echDress
               </span>
             </Link>
           </div>

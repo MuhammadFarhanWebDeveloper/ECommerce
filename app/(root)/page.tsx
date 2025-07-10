@@ -1,13 +1,9 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Star,
   ShoppingCart,
   ArrowRight,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
 import { CardCarousel } from "@/components/card-carousel";
@@ -16,9 +12,7 @@ import { ProductCard } from "@/components/product-card";
 
 export const dynamic = "force-dynamic";
 export default async function Home() {
-  const products = await getProducts();
-  const featuredProducts = products.filter((product) => product.isFeatured);
-  const nonFeaturedProducts = products.filter((product) => !product.isFeatured);
+  const featuredProducts = await getProducts({ isFeaturedProducts: true });
   return (
     <div className="min-h-screen bg-background">
       {/* Banner/Hero Section */}
@@ -74,22 +68,48 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Featured Products Section */}
+      {/* Collections */}
+      <section className="grid grid-cols-1  sm:grid-cols-2 gap-1 px-4 py-8">
+        {/* Men */}
+        <Link
+          href={"/collections?gender=men"}
+          className="relative h-[400px]   rounded overflow-hidden group"
+        >
+          <Image
+            src="/images/men.png"
+            alt="Men Collection"
+            fill
+            style={{ objectFit: "cover" }}
+            className="rounded transform transition duration-300 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+            <h1 className="text-white text-4xl font-bold">Men</h1>
+          </div>
+        </Link>
+
+        {/* Women */}
+        <Link
+          href={"/collections?gender=women"}
+          className="relative h-[400px]   rounded overflow-hidden group"
+        >
+          <Image
+            src="/images/women.png"
+            alt="Women Collection"
+            fill
+            style={{ objectFit: "cover" }}
+            className="rounded transform transition duration-300 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+            <h1 className="text-white text-4xl font-bold">Women</h1>
+          </div>
+        </Link>
+      </section>
+
       <section className="container mx-auto px-4 py-8">
-        {/* Products Grid */}
         {featuredProducts.length > 0 && (
           <CardCarousel products={featuredProducts} title="FeaturedProducts" />
         )}
-          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 container mx-auto px-4 py-8 gap-4">
-        {nonFeaturedProducts.length > 0
-          ? nonFeaturedProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                {...{ ...product, image: product.images[0].url }}
-              />
-            ))
-          : ""}
-      </section>
+       
 
         <div className="text-center mt-8">
           <Button variant="outline" size="lg" asChild>
@@ -101,9 +121,6 @@ export default async function Home() {
         </div>
       </section>
 
-    
-
-      {/* Additional Sections */}
       <section className="bg-muted/50 py-16">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8">
