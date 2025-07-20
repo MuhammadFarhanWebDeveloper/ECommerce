@@ -54,11 +54,11 @@ export default async function Home() {
             </div>
             <div className="relative">
               <Image
-                src="/images/hero.jpg"
+                src="/images/hero.jpeg"
                 alt="Hero Product"
                 width={400}
                 height={300}
-                className="rounded-lg shadow-2xl"
+                className="rounded-lg h-[300px] object-cover object-top shadow-2xl"
               />
               <div className="absolute -bottom-4 -left-4 bg-yellow-400 text-black px-4 py-2 rounded-lg font-semibold">
                 Up to 50% OFF
